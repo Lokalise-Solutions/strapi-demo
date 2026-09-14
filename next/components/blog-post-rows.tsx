@@ -72,7 +72,7 @@ export const BlogPostRow = ({
       className="flex md:flex-row flex-col items-start justify-between md:items-center group py-4"
     >
       <div>
-        <p className="text-neutral-300 text-lg font-medium group-hover:text-white transition duration-200">
+        <p className="text-lokalise text-lg font-medium transition duration-200">
           {article.title}
         </p>
         <p className="text-neutral-300 text-sm mt-2 max-w-xl group-hover:text-white transition duration-200">
@@ -88,7 +88,7 @@ export const BlogPostRow = ({
             {article.categories?.map((category, idx) => (
               <p
                 key={`category-${idx}`}
-                className="text-xs font-bold text-muted px-2 py-1 rounded-full bg-neutral-800 capitalize"
+                className="text-xs font-bold text-white px-2 py-1 rounded-full bg-neutral-800 capitalize"
               >
                 {category.name}
               </p>
