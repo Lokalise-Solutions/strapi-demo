@@ -10,7 +10,7 @@
     "setup:next": "cd next && yarn && node ../scripts/copy-env.mjs ../next",
     "setup:strapi": "cd strapi && yarn && node ../scripts/copy-env.mjs ../strapi",
     "setup": "yarn && yarn setup:next && yarn setup:strapi",
-    "dev": "yarn concurrently \"cd strapi && yarn develop\" \"npx wait-on http://localhost:1337 && cd next && yarn dev\"",
+    "dev": "NODE_OPTIONS=--dns-result-order=ipv4first yarn concurrently \"cd strapi && yarn develop\" \"npx wait-on http://127.0.0.1:1337 && cd next && yarn dev\"",
     "seed": "cd strapi && yarn strapi import -f ./data/export_20250116105447.tar.gz --force",
     "create-demo-admin": "cd strapi && yarn strapi admin:create-user -e admin@strapidemo.com -p welcomeToStrapi123 -f Admin -l Demo",
     "export": "cd strapi && yarn strapi export --no-encrypt -f ./data/export_20250116105447",

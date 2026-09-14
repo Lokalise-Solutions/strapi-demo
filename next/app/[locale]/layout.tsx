@@ -10,7 +10,6 @@ import { DraftModeBanner } from '@/components/draft-mode-banner';
 import { Footer } from '@/components/footer';
 import { Navbar } from '@/components/navbar';
 import { AIToast } from '@/components/toast';
-import { CartProvider } from '@/context/cart-context';
 import { generateMetadataObject } from '@/lib/shared/metadata';
 import { fetchSingleType } from '@/lib/strapi';
 import { cn } from '@/lib/utils';
@@ -20,6 +19,7 @@ const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   weight: ['400', '500', '600', '700', '800', '900'],
+  variable: '--font-sans',
 });
 
 // The Strapi client intentionally bypasses `'use cache'` when
@@ -50,21 +50,20 @@ export default async function LocaleLayout({
 
   return (
     <ViewTransitions>
-      <CartProvider>
-        <div
-          className={cn(
-            inter.className,
-            'bg-charcoal antialiased h-full w-full'
-          )}
-        >
-          {isDemo && <Banner />}
-          <Navbar data={pageData.navbar} locale={locale} hasBanner={isDemo} />
-          {children}
-          <Footer data={pageData.footer} locale={locale} />
-          <AIToast />
-          {isDraftMode && <DraftModeBanner />}
-        </div>
-      </CartProvider>
+      <div
+        className={cn(
+          inter.variable,
+          inter.className,
+          'bg-white text-brand-black antialiased min-h-full w-full'
+        )}
+      >
+        {isDemo && <Banner />}
+        <Navbar data={pageData.navbar} locale={locale} hasBanner={isDemo} />
+        {children}
+        <Footer data={pageData.footer} locale={locale} />
+        <AIToast />
+        {isDraftMode && <DraftModeBanner />}
+      </div>
     </ViewTransitions>
   );
 }

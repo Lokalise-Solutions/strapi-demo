@@ -1,12 +1,8 @@
-'use client';
-
-import { IconSettings } from '@tabler/icons-react';
 import React from 'react';
 
 import { Container } from '../../container';
 import { Heading } from '../../elements/heading';
 import { Subheading } from '../../elements/subheading';
-import { FeatureIconContainer } from '../features/feature-icon-container';
 import { Card } from './card';
 
 export const HowItWorks = ({
@@ -19,26 +15,25 @@ export const HowItWorks = ({
   steps: any;
 }) => {
   return (
-    <div>
-      <Container className="py-20 max-w-7xl mx-auto  relative z-40">
-        <FeatureIconContainer className="flex justify-center items-center overflow-hidden">
-          <IconSettings className="h-6 w-6 text-white" />
-        </FeatureIconContainer>
+    <section className="bg-neutral-50">
+      <Container className="py-20 max-w-7xl mx-auto relative z-40">
         <Heading className="pt-4">{heading}</Heading>
         <Subheading className="max-w-3xl mx-auto">{sub_heading}</Subheading>
 
-        {steps &&
-          steps.map(
-            (item: { title: string; description: string }, index: number) => (
-              <Card
-                title={item.title}
-                description={item.description}
-                index={index + 1}
-                key={'card' + index}
-              />
-            )
-          )}
+        <div className="mt-10 space-y-4">
+          {steps &&
+            steps.map(
+              (item: { title: string; description: string }, index: number) => (
+                <Card
+                  title={item.title}
+                  description={item.description}
+                  index={index + 1}
+                  key={'card' + index}
+                />
+              )
+            )}
+        </div>
       </Container>
-    </div>
+    </section>
   );
 };

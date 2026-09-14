@@ -1,12 +1,11 @@
 const seoData = {
-  title:
-    'Vantage - Ship campaigns in every language',
+  title: 'Vantage - Ship campaigns in every language',
   description: `A workspace for marketing teams who localize campaigns, pages, and assets on brand.`,
   image: 'https://ui.aceternity.com/banner.png',
   openGraph: {
     type: 'website',
     title: `Vantage - Ship campaigns in every language`,
-    url: 'https://ui.aceternity.com', // TODO: Fix this
+    url: 'https://lokalise.com',
     description: `A workspace for marketing teams who localize campaigns, pages, and assets on brand.`,
     locale: 'en_EN',
     keywords: 'localization, marketing, campaigns, translation',
@@ -14,14 +13,14 @@ const seoData = {
       {
         width: 1200,
         height: 630,
-        url: `https://ui.aceternity.com/banner.png`, // TODO: Fix this
+        url: `https://ui.aceternity.com/banner.png`,
       },
     ],
-    site_name: 'vantage',
+    site_name: 'Vantage',
   },
   twitter: {
-    handle: '@mannupaaji',
-    site: 'ui.aceternity.com', // TODO: Fix this
+    handle: '@lokalise',
+    site: 'lokalise.com',
     cardType: 'summary_large_image',
   },
 };

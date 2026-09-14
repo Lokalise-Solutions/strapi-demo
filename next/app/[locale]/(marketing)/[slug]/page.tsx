@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
 import ClientSlugHandler from '../ClientSlugHandler';
+import { isExcludedMarketingUrl } from '@/lib/marketing';
 import PageContent from '@/lib/shared/PageContent';
 import { generateMetadataObject } from '@/lib/shared/metadata';
 import { fetchCollectionType } from '@/lib/strapi';
@@ -10,6 +12,11 @@ export async function generateMetadata({
   params,
 }: LocaleSlugParamsProps): Promise<Metadata> {
   const { slug, locale } = await params;
+
+  if (isExcludedMarketingUrl(`/${slug}`) === true) {
+    redirect(`/${locale}`);
+  }
+
   const [pageData] = await fetchCollectionType('pages', {
     filters: {
       slug: {
@@ -26,6 +33,11 @@ export async function generateMetadata({
 
 export default async function Page({ params }: LocaleSlugParamsProps) {
   const { slug, locale } = await params;
+
+  if (isExcludedMarketingUrl(`/${slug}`) === true) {
+    redirect(`/${locale}`);
+  }
+
   const [pageData] = await fetchCollectionType('pages', {
     filters: {
       slug: {

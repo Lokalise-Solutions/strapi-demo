@@ -2,17 +2,27 @@ import React from 'react';
 
 import { cn } from '@/lib/utils';
 
+const toneClasses = {
+  peach: 'bg-peach-100 border-peach-200',
+  lavender: 'bg-lavender border-violet-100',
+  cream: 'bg-cream border-amber-100',
+  blue: 'bg-light-blue border-slate-200',
+} as const;
+
 export const Card = ({
   className,
   children,
+  tone = 'peach',
 }: {
   className?: string;
   children: React.ReactNode;
+  tone?: keyof typeof toneClasses;
 }) => {
   return (
     <div
       className={cn(
-        'p-8 rounded-3xl border border-[rgba(255,255,255,0.10)] bg-[rgba(40,40,40,0.30)] shadow-[2px_4px_16px_0px_rgba(248,248,248,0.06)_inset] group',
+        'p-8 rounded-2xl border shadow-sm',
+        toneClasses[tone],
         className
       )}
     >
@@ -29,7 +39,12 @@ export const CardTitle = ({
   className?: string;
 }) => {
   return (
-    <h3 className={cn('text-lg font-semibold text-white py-2', className)}>
+    <h3
+      className={cn(
+        'text-lg font-semibold text-brand-black py-2 font-display',
+        className
+      )}
+    >
       {children}
     </h3>
   );
@@ -43,33 +58,8 @@ export const CardDescription = ({
   className?: string;
 }) => {
   return (
-    <p
-      className={cn('text-sm font-normal text-neutral-400 max-w-sm', className)}
-    >
+    <p className={cn('text-sm font-normal text-muted max-w-sm', className)}>
       {children}
     </p>
-  );
-};
-
-export const CardSkeletonContainer = ({
-  className,
-  children,
-  showGradient = true,
-}: {
-  className?: string;
-  children: React.ReactNode;
-  showGradient?: boolean;
-}) => {
-  return (
-    <div
-      className={cn(
-        'h-[20rem] rounded-xl z-40',
-        className,
-        showGradient &&
-          ' bg-[rgba(40,40,40,0.30)] [mask-image:radial-gradient(50%_50%_at_50%_50%,white_0%,transparent_100%)]'
-      )}
-    >
-      {children}
-    </div>
   );
 };

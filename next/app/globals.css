@@ -4,17 +4,19 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 255, 255, 255;
+  --foreground-rgb: 19, 30, 41;
+  --background: #ffffff;
+  --font-display: Georgia, Cambria, 'Times New Roman', serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-  }
+html,
+body {
+  position: relative;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
+  background: var(--background);
 }
 
 @layer utilities {

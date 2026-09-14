@@ -22,13 +22,19 @@ export function NavbarItem({
   className,
 }: Props) {
   const pathname = usePathname();
+  const isActive =
+    active === true ||
+    (typeof href === 'string' && pathname === href) ||
+    (typeof href === 'string' &&
+      href !== `/${pathname?.split('/')[1]}` &&
+      pathname?.startsWith(href) === true);
 
   return (
     <Link
       href={href}
       className={cn(
-        'flex items-center justify-center  text-sm leading-[110%] px-4 py-2 rounded-md  hover:bg-neutral-800 hover:text-white/80 text-white hover:shadow-[0px_1px_0px_0px_var(--neutral-600)_inset] transition duration-200',
-        (active || pathname?.includes(href)) && 'bg-transparent text-white',
+        'flex items-center justify-center text-sm leading-[110%] px-4 py-2 rounded-lg text-brand-black hover:bg-neutral-100 transition duration-200',
+        isActive === true && 'bg-neutral-100 text-brand-black',
         className
       )}
       target={target}

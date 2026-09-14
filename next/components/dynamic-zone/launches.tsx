@@ -1,13 +1,9 @@
 'use client';
 
-import { IconRocket } from '@tabler/icons-react';
-import { motion, useMotionValueEvent } from 'framer-motion';
-import { useScroll } from 'framer-motion';
-import React, { useRef, useState } from 'react';
+import React from 'react';
 
 import { Heading } from '../elements/heading';
 import { Subheading } from '../elements/subheading';
-import { FeatureIconContainer } from './features/feature-icon-container';
 import { StickyScroll } from '@/components/ui/sticky-scroll';
 
 export const Launches = ({
@@ -19,60 +15,22 @@ export const Launches = ({
   sub_heading: string;
   launches: any[];
 }) => {
-  const launchesWithDecoration = launches.map((entry) => ({
+  const launchesWithDecoration = (launches ?? []).map((entry, index) => ({
     ...entry,
-    icon: <IconRocket className="h-8 w-8 text-secondary" />,
     content: (
-      <p className="text-4xl md:text-7xl font-bold text-neutral-800">
-        {entry.mission_number}
+      <p className="text-4xl md:text-6xl font-display font-semibold text-brand-salmon">
+        {entry.mission_number ?? String(index + 1).padStart(2, '0')}
       </p>
     ),
   }));
 
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start end', 'end start'],
-  });
-  const backgrounds = ['var(--charcoal)', 'var(--zinc-900)', 'var(--charcoal)'];
-
-  const [gradient, setGradient] = useState(backgrounds[0]);
-
-  useMotionValueEvent(scrollYProgress, 'change', (latest) => {
-    const cardsBreakpoints = launches.map(
-      (_, index) => index / launches.length
-    );
-    const closestBreakpointIndex = cardsBreakpoints.reduce(
-      (acc, breakpoint, index) => {
-        const distance = Math.abs(latest - breakpoint);
-        if (distance < Math.abs(latest - cardsBreakpoints[acc])) {
-          return index;
-        }
-        return acc;
-      },
-      0
-    );
-    setGradient(backgrounds[closestBreakpointIndex % backgrounds.length]);
-  });
   return (
-    <motion.div
-      animate={{
-        background: gradient,
-      }}
-      transition={{
-        duration: 0.5,
-      }}
-      ref={ref}
-      className="w-full relative h-full pt-20 md:pt-40"
-    >
+    <div className="w-full relative h-full pt-16 md:pt-24 bg-white">
       <div className="px-6">
-        <FeatureIconContainer className="flex justify-center items-center overflow-hidden">
-          <IconRocket className="h-6 w-6 text-white" />
-        </FeatureIconContainer>
         <Heading className="mt-4">{heading}</Heading>
         <Subheading>{sub_heading}</Subheading>
       </div>
       <StickyScroll content={launchesWithDecoration} />
-    </motion.div>
+    </div>
   );
 };

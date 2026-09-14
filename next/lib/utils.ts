@@ -21,8 +21,30 @@ export const formatNumber = (
   }).format(number);
 };
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ||
-      (globalThis.document?.location.host.endsWith('.strapidemo.com') ? `https://${document.location.host.replace('client-', 'api-')}` : '');
+const resolveApiUrl = (): string => {
+  const fromEnv = process.env.NEXT_PUBLIC_API_URL;
+  if (fromEnv !== undefined && fromEnv.trim() !== '') {
+    // Node 17+ prefers IPv6 for `localhost`. Strapi binds 0.0.0.0 (IPv4),
+    // so server-side fetches to localhost:1337 can hang until TCP timeout
+    // and leave the root Suspense spinner on screen.
+    try {
+      const parsed = new URL(fromEnv);
+      if (parsed.hostname === 'localhost') {
+        parsed.hostname = '127.0.0.1';
+        return parsed.toString().replace(/\/$/, '');
+      }
+    } catch {
+      return fromEnv;
+    }
+    return fromEnv;
+  }
+
+  return globalThis.document?.location.host.endsWith('.strapidemo.com')
+    ? `https://${document.location.host.replace('client-', 'api-')}`
+    : '';
+};
+
+export const API_URL = resolveApiUrl();
 
 // Strapi's content source maps (sent in draft mode) append invisible stega
 // markers to every string so the admin preview can locate fields in the DOM.

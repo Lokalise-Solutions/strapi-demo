@@ -3,6 +3,8 @@
 import dynamic from 'next/dynamic';
 import React from 'react';
 
+import { HIDDEN_DYNAMIC_ZONES } from '@/lib/marketing';
+
 interface DynamicZoneComponent {
   __component: string;
   id: number;
@@ -29,9 +31,6 @@ const componentMapping: { [key: string]: any } = {
   'dynamic-zone.brands': dynamic(() =>
     import('./brands').then((mod) => mod.Brands)
   ),
-  'dynamic-zone.pricing': dynamic(() =>
-    import('./pricing').then((mod) => mod.Pricing)
-  ),
   'dynamic-zone.launches': dynamic(() =>
     import('./launches').then((mod) => mod.Launches)
   ),
@@ -40,26 +39,21 @@ const componentMapping: { [key: string]: any } = {
     import('./form-next-to-section').then((mod) => mod.FormNextToSection)
   ),
   'dynamic-zone.faq': dynamic(() => import('./faq').then((mod) => mod.FAQ)),
-  'dynamic-zone.related-products': dynamic(() =>
-    import('./related-products').then((mod) => mod.RelatedProducts)
-  ),
   'dynamic-zone.related-articles': dynamic(() =>
     import('./related-articles').then((mod) => mod.RelatedArticles)
   ),
 };
 
-const hiddenComponents = new Set(['dynamic-zone.brands']);
-
 const DynamicZoneManager: React.FC<Props> = ({ dynamicZone, locale }) => {
   return (
     <div>
       {dynamicZone.map((componentData, index) => {
-        if (hiddenComponents.has(componentData.__component)) {
+        if (HIDDEN_DYNAMIC_ZONES.has(componentData.__component)) {
           return null;
         }
+
         const Component = componentMapping[componentData.__component];
         if (!Component) {
-          console.warn(`No component found for: ${componentData.__component}`);
           return null;
         }
         return (

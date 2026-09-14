@@ -6,24 +6,24 @@ import { resolveStrapiMedia } from '@/lib/strapi/strapiImage';
 import { Image } from '@/types/types';
 
 export const Logo = ({ image, locale }: { image?: Image; locale?: string }) => {
-  if (image) {
-    return (
-      <Link
-        href={`/${locale || 'en'}`}
-        className="font-normal flex space-x-2 items-center text-sm mr-4  text-black   relative z-20"
-      >
+  return (
+    <Link
+      href={`/${locale || 'en'}`}
+      className="font-normal flex space-x-2 items-center text-sm mr-4 text-brand-black relative z-20"
+    >
+      {image === undefined || image === null ? (
+        <span className="text-brand-black font-bold text-lg tracking-tight">
+          Vantage
+        </span>
+      ) : (
         <BlurImage
           {...resolveStrapiMedia(image?.url)}
-          alt={image.alternativeText}
+          alt={image.alternativeText || 'Vantage'}
           width={200}
           height={200}
-          className="h-10 w-10 rounded-xl mr-2"
+          className="h-8 w-auto object-contain"
         />
-
-        <span className="text-white font-bold">Vantage</span>
-      </Link>
-    );
-  }
-
-  return;
+      )}
+    </Link>
+  );
 };
