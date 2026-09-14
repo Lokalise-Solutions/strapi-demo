@@ -106,6 +106,63 @@ function withLocale(
   return next;
 }
 
+function isNotFoundError(error: unknown): boolean {
+  if (error === null || error === undefined || typeof error !== 'object') {
+    return false;
+  }
+
+  if ('status' in error && (error as { status?: unknown }).status === 404) {
+    return true;
+  }
+
+  const response =
+    'response' in error
+      ? (error as { response?: { status?: unknown } }).response
+      : undefined;
+  if (response?.status === 404) {
+    return true;
+  }
+
+  const message = error instanceof Error ? error.message : '';
+  return message.includes('404') || message.includes('Not Found');
+}
+
+async function findSingleWithLocaleFallback<T>(
+  singleTypeName: string,
+  options: API.BaseQueryParams | undefined,
+  config: Omit<Config, 'baseURL'> | undefined,
+  isDraft: boolean
+): Promise<T> {
+  const status = isDraft ? 'draft' : 'published';
+
+  try {
+    const { data } = await createClient(config, isDraft)
+      .single(singleTypeName)
+      .find({
+        ...options,
+        status,
+      });
+    return data as T;
+  } catch (error) {
+    const locale = requestedLocale(options);
+    if (
+      isNotFoundError(error) === true &&
+      locale !== undefined &&
+      locale !== i18n.defaultLocale
+    ) {
+      const { data } = await createClient(config, isDraft)
+        .single(singleTypeName)
+        .find({
+          ...withLocale(options, i18n.defaultLocale),
+          status,
+        });
+      return data as T;
+    }
+
+    throw error;
+  }
+}
+
 function toStrapiError(
   error: unknown,
   message: string,
@@ -247,14 +304,12 @@ async function fetchSingleCached<T = API.Document>(
   cacheLife('minutes');
   cacheTag(`single-${singleTypeName}`);
 
-  const { data } = await createClient(config)
-    .single(singleTypeName)
-    .find({
-      ...options,
-      status: 'published',
-    });
-
-  return data as T;
+  return findSingleWithLocaleFallback<T>(
+    singleTypeName,
+    options,
+    config,
+    false
+  );
 }
 
 /**
@@ -273,23 +328,21 @@ export async function fetchSingleType<T = API.Document>(
 
   const load = async (query: API.BaseQueryParams | undefined): Promise<T> => {
     if (isDraftMode) {
-      const { data } = await createClient(config, true)
-        .single(singleTypeName)
-        .find({
-          ...query,
-          status: 'draft',
-        });
-      return data as T;
+      return findSingleWithLocaleFallback<T>(
+        singleTypeName,
+        query,
+        config,
+        true
+      );
     }
 
     if (process.env.ENVIRONMENT === 'development') {
-      const { data } = await createClient(config)
-        .single(singleTypeName)
-        .find({
-          ...query,
-          status: 'published',
-        });
-      return data as T;
+      return findSingleWithLocaleFallback<T>(
+        singleTypeName,
+        query,
+        config,
+        false
+      );
     }
 
     return fetchSingleCached<T>(singleTypeName, query, config);
