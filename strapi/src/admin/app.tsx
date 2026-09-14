@@ -14,7 +14,7 @@ export default {
           icon: Information,
           title: {
             id: 'demo.widget.title',
-            defaultMessage: 'Welcome to LaunchPad',
+            defaultMessage: 'Welcome to Vantage',
           },
           component: async () => {
             const component = await import('./components/DemoWidget');

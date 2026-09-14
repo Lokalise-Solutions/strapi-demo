@@ -1,15 +1,15 @@
 const seoData = {
   title:
-    'LaunchPad - Your content delivery partner for large scale applications',
-  description: `A platform integrating Aceternity with Strapi for seamless content management.`,
+    'Vantage - Ship campaigns in every language',
+  description: `A workspace for marketing teams who localize campaigns, pages, and assets on brand.`,
   image: 'https://ui.aceternity.com/banner.png',
   openGraph: {
     type: 'website',
-    title: `LaunchPad - Your content delivery partner for large scale applications`,
+    title: `Vantage - Ship campaigns in every language`,
     url: 'https://ui.aceternity.com', // TODO: Fix this
-    description: `A platform integrating Aceternity with Strapi for seamless content management.`,
+    description: `A workspace for marketing teams who localize campaigns, pages, and assets on brand.`,
     locale: 'en_EN',
-    keywords: 'content, delivery, web, hosting',
+    keywords: 'localization, marketing, campaigns, translation',
     images: [
       {
         width: 1200,
@@ -17,7 +17,7 @@ const seoData = {
         url: `https://ui.aceternity.com/banner.png`, // TODO: Fix this
       },
     ],
-    site_name: 'launchpad',
+    site_name: 'vantage',
   },
   twitter: {
     handle: '@mannupaaji',

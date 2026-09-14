@@ -48,10 +48,15 @@ const componentMapping: { [key: string]: any } = {
   ),
 };
 
+const hiddenComponents = new Set(['dynamic-zone.brands']);
+
 const DynamicZoneManager: React.FC<Props> = ({ dynamicZone, locale }) => {
   return (
     <div>
       {dynamicZone.map((componentData, index) => {
+        if (hiddenComponents.has(componentData.__component)) {
+          return null;
+        }
         const Component = componentMapping[componentData.__component];
         if (!Component) {
           console.warn(`No component found for: ${componentData.__component}`);

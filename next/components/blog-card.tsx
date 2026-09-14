@@ -43,13 +43,13 @@ export const BlogCard = ({
             {article.categories?.map((category, idx) => (
               <p
                 key={`category-${idx}`}
-                className="text-xs font-bold text-muted px-4 py-2 rounded-full bg-neutral-800 capitalize"
+                className="text-xs font-bold text-white px-4 py-2 rounded-full bg-neutral-800 capitalize"
               >
                 {category.name}
               </p>
             ))}
           </div>
-          <p className="text-lg md:text-4xl font-bold mb-4">
+          <p className="text-lg md:text-4xl font-bold mb-4 text-lokalise">
             <Balancer>{article.title}</Balancer>
           </p>
           <p className="text-left text-base md:text-xl mt-2 text-muted">
@@ -108,13 +108,13 @@ export const BlogCardVertical = ({
             {article.categories?.map((category, idx) => (
               <p
                 key={`category-${idx}`}
-                className="text-xs font-bold text-muted px-4 py-2 rounded-full bg-neutral-800 capitalize"
+                className="text-xs font-bold text-white px-4 py-2 rounded-full bg-neutral-800 capitalize"
               >
                 {category.name}
               </p>
             ))}
           </div>
-          <p className="text-lg md:text-xl font-bold mb-4">
+          <p className="text-lg md:text-xl font-bold mb-4 text-lokalise">
             <Balancer>{article.title}</Balancer>
           </p>
           <p className="text-left text-sm md:text-base mt-2 text-muted">
