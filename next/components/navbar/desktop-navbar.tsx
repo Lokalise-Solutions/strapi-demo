@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  AnimatePresence,
-  motion,
-  useMotionValueEvent,
-  useScroll,
-} from 'framer-motion';
+import { motion, useMotionValueEvent, useScroll } from 'framer-motion';
 import { Link } from 'next-view-transitions';
 import { useState } from 'react';
 
@@ -37,7 +32,6 @@ export const DesktopNavbar = ({
   locale,
 }: Props) => {
   const { scrollY } = useScroll();
-
   const [showBackground, setShowBackground] = useState(false);
 
   useMotionValueEvent(scrollY, 'change', (value) => {
@@ -47,32 +41,19 @@ export const DesktopNavbar = ({
       setShowBackground(false);
     }
   });
+
   return (
     <motion.div
       className={cn(
-        'w-full flex relative justify-between px-4 py-3 rounded-md  transition duration-200 bg-transparent mx-auto'
+        'w-full flex relative justify-between px-4 py-3 transition duration-200 bg-transparent mx-auto'
       )}
-      animate={{
-        width: showBackground ? '80%' : '100%',
-        background: showBackground ? 'var(--neutral-900)' : 'transparent',
-      }}
-      transition={{
-        duration: 0.4,
-      }}
     >
-      <AnimatePresence>
-        {showBackground && (
-          <motion.div
-            key={String(showBackground)}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{
-              duration: 1,
-            }}
-            className="absolute inset-0 h-full w-full bg-neutral-900 pointer-events-none [mask-image:linear-gradient(to_bottom,white,transparent,white)] rounded-full"
-          />
+      <div
+        className={cn(
+          'absolute inset-0 pointer-events-none transition-opacity duration-200',
+          showBackground === true ? 'opacity-100' : 'opacity-0'
         )}
-      </AnimatePresence>
+      />
       <div className="flex flex-row gap-2 items-center">
         <Logo locale={locale} image={logo?.image} />
         <div className="flex items-center gap-1.5">
