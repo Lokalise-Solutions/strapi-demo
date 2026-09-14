@@ -24,7 +24,14 @@ export const Features = ({
     globe_card ? { ...globe_card, tone: 'peach' as const } : null,
     ray_card ? { ...ray_card, tone: 'lavender' as const } : null,
     graph_card ? { ...graph_card, tone: 'cream' as const } : null,
-    social_media_card ? { ...social_media_card, tone: 'blue' as const } : null,
+    social_media_card
+      ? {
+          title: social_media_card.title ?? social_media_card.Title,
+          description:
+            social_media_card.description ?? social_media_card.Description,
+          tone: 'blue' as const,
+        }
+      : null,
   ].filter(
     (
       card
