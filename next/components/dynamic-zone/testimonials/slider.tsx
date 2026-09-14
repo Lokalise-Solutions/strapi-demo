@@ -12,7 +12,9 @@ export const TestimonialsSlider = ({ testimonials }: { testimonials: any }) => {
   const [autorotate, setAutorotate] = useState<boolean>(true);
   const testimonialsRef = useRef<HTMLDivElement>(null);
 
-  const slicedTestimonials = testimonials.slice(0, 3);
+  const slicedTestimonials = Array.isArray(testimonials)
+    ? testimonials.slice(0, 3)
+    : [];
 
   useEffect(() => {
     if (!autorotate) return;
@@ -82,10 +84,10 @@ export const TestimonialsSlider = ({ testimonials }: { testimonials: any }) => {
                     <div className="absolute inset-0 h-full -z-10">
                       <StrapiMedia
                         className="relative top-11 left-1/2 -translate-x-1/2 rounded-full"
-                        src={item.user.image.url}
+                        src={item.user?.image?.url}
                         width={56}
                         height={56}
-                        alt={`${item.user.firstname} ${item.user.lastname}`}
+                        alt={`${item.user?.firstname ?? ''} ${item.user?.lastname ?? ''}`.trim()}
                       />
                     </div>
                   </Transition>

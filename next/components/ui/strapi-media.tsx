@@ -10,7 +10,7 @@ import {
 
 interface StrapiMediaProps
   extends Omit<ComponentProps<typeof Image>, 'src' | 'alt'> {
-  src: string;
+  src?: string | null;
   alt?: string | null;
   mime?: string | null;
   videoProps?: Omit<VideoHTMLAttributes<HTMLVideoElement>, 'src' | 'className'>;
