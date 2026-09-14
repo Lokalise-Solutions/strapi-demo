@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 import ClientSlugHandler from './ClientSlugHandler';
 import PageContent from '@/lib/shared/PageContent';
@@ -22,6 +23,10 @@ export async function generateMetadata({
     },
   });
 
+  if (pageData === undefined) {
+    return {};
+  }
+
   const seo = pageData.seo;
   const metadata = generateMetadataObject(seo);
   return metadata;
@@ -38,6 +43,10 @@ export default async function HomePage({ params }: LocaleParamsProps) {
       locale: locale,
     },
   });
+
+  if (pageData === undefined) {
+    notFound();
+  }
 
   const localizedSlugs = pageData.localizations?.reduce(
     (acc: Record<string, string>, localization: any) => {

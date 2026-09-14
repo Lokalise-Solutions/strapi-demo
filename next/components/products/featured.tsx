@@ -2,6 +2,7 @@ import { Link } from 'next-view-transitions';
 import React from 'react';
 
 import { StrapiMedia } from '@/components/ui/strapi-media';
+import { currencySymbol } from '@/lib/locale';
 import { formatNumber } from '@/lib/utils';
 import { Product } from '@/types/types';
 
@@ -62,7 +63,7 @@ const FeaturedItem = ({
       <div className="absolute text-sm top-4 right-2 md:top-10 md:right-10 z-40 bg-white rounded-full pr-1 pl-4 py-1 text-black font-medium flex gap-4 items-center">
         <span>{product.name}</span>
         <span className="bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 text-white px-2 py-1 rounded-full">
-          {locale === 'fr' ? '€' : '$'}
+          {currencySymbol(locale)}
           {formatNumber(product.price, locale)}
         </span>
       </div>

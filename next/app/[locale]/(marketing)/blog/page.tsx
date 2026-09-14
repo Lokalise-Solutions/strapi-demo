@@ -36,7 +36,7 @@ export default async function Blog({ params }: LocaleParamsProps) {
     }
   );
 
-  const localizedSlugs = pageData.localizations.reduce(
+  const localizedSlugs = pageData.localizations?.reduce(
     (acc: Record<string, string>, localization: any) => {
       acc[localization.locale] = 'blog';
       return acc;

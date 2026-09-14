@@ -1,5 +1,26 @@
-import { draftMode } from 'next/headers';
+import { cookies, draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
+
+function isSafeRelativePath(url: string): boolean {
+  return url.startsWith('/') && url.startsWith('//') === false;
+}
+
+async function allowDraftCookieInIframe() {
+  const cookieStore = await cookies();
+  const draftCookie = cookieStore.get('__prerender_bypass');
+  if (draftCookie?.value === undefined) {
+    return;
+  }
+
+  cookieStore.set({
+    name: '__prerender_bypass',
+    value: draftCookie.value,
+    httpOnly: true,
+    path: '/',
+    secure: true,
+    sameSite: 'none',
+  });
+}
 
 export const GET = async (request: Request) => {
   const { searchParams } = new URL(request.url);
@@ -7,8 +28,6 @@ export const GET = async (request: Request) => {
   const url = searchParams.get('url') ?? '/';
   const status = searchParams.get('status');
 
-  // Check the secret and next parameters
-  // This secret should only be known to this route handler and the CMS
   if (secret !== process.env.PREVIEW_SECRET) {
     return new Response('Invalid token', { status: 401 });
   }
@@ -16,12 +35,11 @@ export const GET = async (request: Request) => {
   const draft = await draftMode();
 
   if (status === 'published') {
-    // Make sure draft mode is disabled so we only query published content
     draft.disable();
   } else {
-    // Enable draft mode so we can query draft content
     draft.enable();
+    await allowDraftCookieInIframe();
   }
 
-  redirect(url);
+  redirect(isSafeRelativePath(url) === true ? url : '/');
 };

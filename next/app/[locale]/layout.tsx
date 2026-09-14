@@ -10,10 +10,15 @@ import { DraftModeBanner } from '@/components/draft-mode-banner';
 import { Footer } from '@/components/footer';
 import { Navbar } from '@/components/navbar';
 import { AIToast } from '@/components/toast';
+import { i18n } from '@/i18n.config';
 import { generateMetadataObject } from '@/lib/shared/metadata';
 import { fetchSingleType } from '@/lib/strapi';
 import { cn } from '@/lib/utils';
 import type { LocaleParamsProps } from '@/types/types';
+
+export function generateStaticParams() {
+  return i18n.locales.map((locale) => ({ locale }));
+}
 
 const inter = Inter({
   subsets: ['latin'],

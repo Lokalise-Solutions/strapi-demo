@@ -3,6 +3,7 @@ import type { API, Config } from '@strapi/client';
 import { cacheLife, cacheTag, revalidateTag } from 'next/cache';
 import { draftMode } from 'next/headers';
 
+import { i18n } from '@/i18n.config';
 import { API_URL } from '../utils';
 
 const STRAPI_FETCH_TIMEOUT_MS = 8000;
@@ -46,6 +47,63 @@ async function withTimeout<T>(promise: Promise<T>, label: string): Promise<T> {
       clearTimeout(timeoutId);
     }
   }
+}
+
+function requestedLocale(options?: API.BaseQueryParams): string | undefined {
+  if (typeof options?.locale === 'string' && options.locale.length > 0) {
+    return options.locale;
+  }
+
+  const localeFilter =
+    options?.filters !== undefined && options.filters !== null
+      ? (options.filters as { locale?: unknown }).locale
+      : undefined;
+
+  if (typeof localeFilter === 'string' && localeFilter.length > 0) {
+    return localeFilter;
+  }
+
+  if (
+    localeFilter !== undefined &&
+    localeFilter !== null &&
+    typeof localeFilter === 'object' &&
+    '$eq' in localeFilter
+  ) {
+    const equals = (localeFilter as { $eq?: unknown }).$eq;
+    if (typeof equals === 'string' && equals.length > 0) {
+      return equals;
+    }
+  }
+
+  return undefined;
+}
+
+function withLocale(
+  options: API.BaseQueryParams | undefined,
+  locale: string
+): API.BaseQueryParams {
+  const next: API.BaseQueryParams = { ...options };
+
+  if (typeof options?.locale === 'string') {
+    next.locale = locale;
+  }
+
+  if (options?.filters !== undefined && options.filters !== null) {
+    const filters = { ...(options.filters as Record<string, unknown>) };
+    if (typeof filters.locale === 'string') {
+      filters.locale = locale;
+    } else if (
+      filters.locale !== undefined &&
+      filters.locale !== null &&
+      typeof filters.locale === 'object' &&
+      '$eq' in (filters.locale as object)
+    ) {
+      filters.locale = { $eq: locale };
+    }
+    next.filters = filters as API.BaseQueryParams['filters'];
+  }
+
+  return next;
 }
 
 function toStrapiError(
@@ -112,37 +170,63 @@ export async function fetchCollectionType<T = API.Document[]>(
   assertApiUrl(collectionName);
   const { isEnabled: isDraftMode } = await draftMode();
 
+  const load = async (query: API.BaseQueryParams | undefined): Promise<T> => {
+    if (isDraftMode) {
+      const { data } = await createClient(config, true)
+        .collection(collectionName)
+        .find({
+          ...query,
+          status: 'draft',
+        });
+      return data as T;
+    }
+
+    if (process.env.ENVIRONMENT === 'development') {
+      const { data } = await createClient(config)
+        .collection(collectionName)
+        .find({
+          ...query,
+          status: 'published',
+        });
+      return data as T;
+    }
+
+    return fetchCollectionCached<T>(collectionName, query, config);
+  };
+
   try {
-    return await withTimeout(
-      (async () => {
-        // Bypass cache in draft mode for real-time preview
-        if (isDraftMode) {
-          const { data } = await createClient(config, true)
-            .collection(collectionName)
-            .find({
-              ...options,
-              status: 'draft',
-            });
-          return data as T;
-        }
-
-        // Bypass cache in development mode
-        if (process.env.ENVIRONMENT === 'development') {
-          const { data } = await createClient(config)
-            .collection(collectionName)
-            .find({
-              ...options,
-              status: 'published',
-            });
-          return data as T;
-        }
-
-        // Use cached version for published content
-        return fetchCollectionCached<T>(collectionName, options, config);
-      })(),
+    const data = await withTimeout(
+      load(options),
       `fetching collection "${collectionName}"`
     );
+
+    const locale = requestedLocale(options);
+    if (
+      Array.isArray(data) &&
+      data.length === 0 &&
+      locale !== undefined &&
+      locale !== i18n.defaultLocale
+    ) {
+      return await withTimeout(
+        load(withLocale(options, i18n.defaultLocale)),
+        `fetching collection "${collectionName}"`
+      );
+    }
+
+    return data;
   } catch (error) {
+    const locale = requestedLocale(options);
+    if (locale !== undefined && locale !== i18n.defaultLocale) {
+      try {
+        return await withTimeout(
+          load(withLocale(options, i18n.defaultLocale)),
+          `fetching collection "${collectionName}"`
+        );
+      } catch {
+        // Fall through to the original error.
+      }
+    }
+
     throw toStrapiError(
       error,
       `Failed to fetch collection "${collectionName}"`,
@@ -187,34 +271,45 @@ export async function fetchSingleType<T = API.Document>(
   assertApiUrl(singleTypeName);
   const { isEnabled: isDraftMode } = await draftMode();
 
+  const load = async (query: API.BaseQueryParams | undefined): Promise<T> => {
+    if (isDraftMode) {
+      const { data } = await createClient(config, true)
+        .single(singleTypeName)
+        .find({
+          ...query,
+          status: 'draft',
+        });
+      return data as T;
+    }
+
+    if (process.env.ENVIRONMENT === 'development') {
+      const { data } = await createClient(config)
+        .single(singleTypeName)
+        .find({
+          ...query,
+          status: 'published',
+        });
+      return data as T;
+    }
+
+    return fetchSingleCached<T>(singleTypeName, query, config);
+  };
+
   try {
-    return await withTimeout(
-      (async () => {
-        if (isDraftMode) {
-          const { data } = await createClient(config, true)
-            .single(singleTypeName)
-            .find({
-              ...options,
-              status: 'draft',
-            });
-          return data as T;
-        }
-
-        if (process.env.ENVIRONMENT === 'development') {
-          const { data } = await createClient(config)
-            .single(singleTypeName)
-            .find({
-              ...options,
-              status: 'published',
-            });
-          return data as T;
-        }
-
-        return fetchSingleCached<T>(singleTypeName, options, config);
-      })(),
-      `fetching "${singleTypeName}"`
-    );
+    return await withTimeout(load(options), `fetching "${singleTypeName}"`);
   } catch (error) {
+    const locale = requestedLocale(options);
+    if (locale !== undefined && locale !== i18n.defaultLocale) {
+      try {
+        return await withTimeout(
+          load(withLocale(options, i18n.defaultLocale)),
+          `fetching "${singleTypeName}"`
+        );
+      } catch {
+        // Fall through to the original error.
+      }
+    }
+
     throw toStrapiError(
       error,
       `Failed to fetch single type "${singleTypeName}"`,

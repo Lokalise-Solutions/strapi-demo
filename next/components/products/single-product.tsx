@@ -8,6 +8,7 @@ import AddToCartModal from '@/components/products/modal';
 import { StrapiMedia } from '@/components/ui/strapi-media';
 import { useCart } from '@/context/cart-context';
 import { strapiImage } from '@/lib/strapi/strapiImage';
+import { currencySymbol } from '@/lib/locale';
 import { cn, formatNumber } from '@/lib/utils';
 import { Product } from '@/types/types';
 
@@ -82,7 +83,7 @@ export const SingleProduct = ({
         <div>
           <h2 className="text-2xl font-semibold mb-4">{product.name}</h2>
           <p className=" mb-6 bg-white text-xs px-4 py-1 rounded-full text-black w-fit">
-            {locale === 'fr' ? '€' : '$'}
+            {currencySymbol(locale)}
             {formatNumber(product.price, locale)}
           </p>
           <p className="text-base font-normal mb-4 text-neutral-400">

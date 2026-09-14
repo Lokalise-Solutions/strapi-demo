@@ -52,6 +52,20 @@ const nextConfig = {
     ],
   },
   pageExtensions: ['ts', 'tsx'],
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value:
+              "frame-ancestors 'self' http://localhost:1337 http://127.0.0.1:1337 https://*.strapiapp.com https://*.admin.strapiapp.com",
+          },
+        ],
+      },
+    ];
+  },
   async redirects() {
     const apiUrl = strapiOrigin();
     if (apiUrl === undefined) {

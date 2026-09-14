@@ -2,6 +2,7 @@ import { Link } from 'next-view-transitions';
 import React from 'react';
 
 import { StrapiMedia } from '@/components/ui/strapi-media';
+import { currencySymbol } from '@/lib/locale';
 import { formatNumber, truncate } from '@/lib/utils';
 import { Product } from '@/types/types';
 
@@ -67,7 +68,7 @@ const ProductItem = ({
             {product.name}
           </span>
           <span className="bg-white text-black shadow-derek text-xs px-2 py-1 rounded-full">
-            {locale === 'fr' ? '€' : '$'}
+            {currencySymbol(locale)}
             {formatNumber(product.price, locale)}
           </span>
         </div>

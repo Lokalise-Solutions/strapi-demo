@@ -16,6 +16,8 @@ const getPreviewPathname = (uid, { locale, document }): string | null => {
       return `/blog/${slug}`;
     case 'api::blog-page.blog-page':
       return '/blog';
+    case 'api::global.global':
+      return '/';
     default:
       return null;
   }
@@ -24,6 +26,12 @@ const getPreviewPathname = (uid, { locale, document }): string | null => {
 export default ({ env }) => {
   const clientUrl = env('CLIENT_URL');
   const previewSecret = env('PREVIEW_SECRET');
+  const allowedOrigins = [
+    clientUrl,
+    env('WEBSITE_URL'),
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+  ].filter((origin) => typeof origin === 'string' && origin.length > 0);
 
   return {
     auth: {
@@ -42,23 +50,26 @@ export default ({ env }) => {
       promoteEE: env.bool('FLAG_PROMOTE_EE', true),
     },
     preview: {
-      enabled: true,
+      enabled: clientUrl !== undefined && previewSecret !== undefined,
       config: {
-        allowedOrigins: [clientUrl],
+        allowedOrigins,
         async handler(uid, { documentId, locale, status }) {
           const document = await strapi
             .documents(uid)
             .findOne({ documentId, locale, status });
           const pathname = getPreviewPathname(uid, { locale, document });
 
-          // Disable preview if the pathname is not found
-          if (!pathname) {
+          if (pathname === null || clientUrl === undefined) {
             return null;
           }
 
-          // Use Next.js draft mode
+          const localizedPath =
+            pathname === '/'
+              ? `/${locale ?? 'en'}`
+              : `/${locale ?? 'en'}${pathname}`;
+
           const urlSearchParams = new URLSearchParams({
-            url: `/${locale ?? 'en'}${pathname}`,
+            url: localizedPath,
             secret: previewSecret,
             status,
           });
