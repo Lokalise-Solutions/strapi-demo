@@ -1,3 +1,20 @@
+const strapiOrigin = () => {
+  const raw = process.env.NEXT_PUBLIC_API_URL;
+  if (raw === undefined || raw.trim() === '') {
+    return undefined;
+  }
+
+  try {
+    const parsed = new URL(raw);
+    if (parsed.hostname === 'localhost') {
+      parsed.hostname = '127.0.0.1';
+    }
+    return parsed.toString().replace(/\/$/, '');
+  } catch {
+    return raw;
+  }
+};
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: process.env.NEXT_OUTPUT || undefined,
@@ -18,6 +35,12 @@ const nextConfig = {
         pathname: '/uploads/**',
       },
       {
+        protocol: 'http',
+        hostname: '127.0.0.1',
+        port: '1337',
+        pathname: '/uploads/**',
+      },
+      {
         protocol: 'https',
         hostname: process.env.IMAGE_HOSTNAME || 'localhost',
         pathname: '/uploads/**',
@@ -30,7 +53,8 @@ const nextConfig = {
   },
   pageExtensions: ['ts', 'tsx'],
   async redirects() {
-    if (process.env.NEXT_PUBLIC_API_URL === undefined) {
+    const apiUrl = strapiOrigin();
+    if (apiUrl === undefined) {
       console.warn(
         '[next.config] NEXT_PUBLIC_API_URL is not defined. Skipping redirect generation.'
       );
@@ -39,9 +63,9 @@ const nextConfig = {
 
     let redirections = [];
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/redirections`
-      );
+      const res = await fetch(`${apiUrl}/api/redirections`, {
+        signal: AbortSignal.timeout(3000),
+      });
       const result = await res.json();
       const redirectItems = result.data.map(({ source, destination }) => {
         return {

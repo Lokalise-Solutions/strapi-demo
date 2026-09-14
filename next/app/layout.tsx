@@ -21,8 +21,9 @@ export async function generateStaticParams() {
 
 function RootLoading() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-white">
       <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-salmon border-t-transparent" />
+      <p className="text-sm text-neutral-500">Loading the site…</p>
     </div>
   );
 }

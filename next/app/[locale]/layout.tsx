@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { ViewTransitions } from 'next-view-transitions';
-import { Outfit, Source_Serif_4 } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import { draftMode } from 'next/headers';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
@@ -15,17 +15,11 @@ import { fetchSingleType } from '@/lib/strapi';
 import { cn } from '@/lib/utils';
 import type { LocaleParamsProps } from '@/types/types';
 
-const outfit = Outfit({
+const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
+  weight: ['400', '500', '600', '700', '800', '900'],
   variable: '--font-sans',
-});
-
-const sourceSerif = Source_Serif_4({
-  subsets: ['latin'],
-  display: 'swap',
-  weight: ['600', '700'],
-  variable: '--font-display',
 });
 
 // The Strapi client intentionally bypasses `'use cache'` when
@@ -58,9 +52,8 @@ export default async function LocaleLayout({
     <ViewTransitions>
       <div
         className={cn(
-          outfit.variable,
-          sourceSerif.variable,
-          outfit.className,
+          inter.variable,
+          inter.className,
           'bg-white text-brand-black antialiased min-h-full w-full'
         )}
       >

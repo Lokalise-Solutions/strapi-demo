@@ -6,6 +6,7 @@
 :root {
   --foreground-rgb: 19, 30, 41;
   --background: #ffffff;
+  --font-display: Georgia, Cambria, 'Times New Roman', serif;
 }
 
 html,
