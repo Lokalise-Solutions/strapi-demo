@@ -1,27 +1,28 @@
 const seoData = {
-  title:
-    'LaunchPad - Your content delivery partner for large scale applications',
-  description: `A platform integrating Aceternity with Strapi for seamless content management.`,
+  title: 'Lokalise — Localization for marketing teams',
+  description:
+    'Lokalise gives marketing, content, and creative teams one place to localize campaigns, websites, and assets — on brand, on time, in every market.',
   image: 'https://ui.aceternity.com/banner.png',
   openGraph: {
     type: 'website',
-    title: `LaunchPad - Your content delivery partner for large scale applications`,
-    url: 'https://ui.aceternity.com', // TODO: Fix this
-    description: `A platform integrating Aceternity with Strapi for seamless content management.`,
+    title: 'Lokalise — Localization for marketing teams',
+    url: 'https://lokalise.com',
+    description:
+      'Lokalise gives marketing, content, and creative teams one place to localize campaigns, websites, and assets — on brand, on time, in every market.',
     locale: 'en_EN',
-    keywords: 'content, delivery, web, hosting',
+    keywords: 'localization, translation, marketing, vantage, cms',
     images: [
       {
         width: 1200,
         height: 630,
-        url: `https://ui.aceternity.com/banner.png`, // TODO: Fix this
+        url: `https://ui.aceternity.com/banner.png`,
       },
     ],
-    site_name: 'launchpad',
+    site_name: 'Lokalise',
   },
   twitter: {
-    handle: '@mannupaaji',
-    site: 'ui.aceternity.com', // TODO: Fix this
+    handle: '@lokalise',
+    site: 'lokalise.com',
     cardType: 'summary_large_image',
   },
 };

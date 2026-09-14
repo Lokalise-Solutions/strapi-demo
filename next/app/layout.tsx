@@ -10,8 +10,8 @@ import { Preview } from '@/components/preview';
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#06b6d4' },
-    { media: '(prefers-color-scheme: dark)', color: '#06b6d4' },
+    { media: '(prefers-color-scheme: light)', color: '#F97362' },
+    { media: '(prefers-color-scheme: dark)', color: '#131E29' },
   ],
 };
 
@@ -21,8 +21,8 @@ export async function generateStaticParams() {
 
 function RootLoading() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-charcoal">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-cyan-500 border-t-transparent" />
+    <div className="flex min-h-screen items-center justify-center bg-white">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-salmon border-t-transparent" />
     </div>
   );
 }

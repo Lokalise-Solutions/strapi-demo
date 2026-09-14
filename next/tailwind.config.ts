@@ -16,8 +16,26 @@ const config: Config = {
       colors: {
         charcoal: '#08090A',
         lightblack: '#1C1C1C',
-        secondary: '#E6E6E6',
-        muted: 'var(--neutral-200)',
+        secondary: '#F4F4F5',
+        muted: '#596773',
+        brand: {
+          salmon: '#F97362',
+          black: '#131E29',
+        },
+        peach: {
+          100: '#FEF2F0',
+          200: '#FEE9E6',
+          300: '#FDD3CE',
+          600: '#F97362',
+          700: '#ED2509',
+        },
+        cream: '#FEF6EC',
+        lavender: '#F5F3FF',
+        'light-blue': '#EDF2F6',
+      },
+      fontFamily: {
+        sans: ['var(--font-sans)', 'Roboto', 'Arial', 'sans-serif'],
+        display: ['var(--font-display)', 'Georgia', 'Cambria', 'serif'],
       },
       boxShadow: {
         derek: `0px 0px 0px 1px rgb(0 0 0 / 0.06),
