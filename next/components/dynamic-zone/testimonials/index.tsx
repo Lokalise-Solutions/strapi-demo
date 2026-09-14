@@ -1,14 +1,8 @@
-'use client';
-
 import React from 'react';
-import { TbLocationBolt } from 'react-icons/tb';
 
-import { AmbientColor } from '../../decorations/ambient-color';
 import { Heading } from '../../elements/heading';
 import { Subheading } from '../../elements/subheading';
-import { FeatureIconContainer } from '../features/feature-icon-container';
-import { TestimonialsSlider } from './slider';
-import { TestimonialsMarquee } from './testimonials-marquee';
+import { StrapiMedia } from '@/components/ui/strapi-media';
 
 export const Testimonials = ({
   heading,
@@ -17,29 +11,44 @@ export const Testimonials = ({
 }: {
   heading: string;
   sub_heading: string;
-  testimonials: object;
+  testimonials: any;
 }) => {
+  const items = Array.isArray(testimonials) ? testimonials : [];
+
   return (
-    <div className="relative">
-      <AmbientColor />
-      <div className="pb-20">
-        <FeatureIconContainer className="flex justify-center items-center overflow-hidden">
-          <TbLocationBolt className="h-6 w-6 text-white" />
-        </FeatureIconContainer>
-        <Heading className="pt-4">{heading}</Heading>
-        <Subheading>{sub_heading}</Subheading>
+    <section className="relative bg-cream py-20">
+      <Heading className="pt-4">{heading}</Heading>
+      <Subheading>{sub_heading}</Subheading>
+
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-6 mt-12">
+        {items.slice(0, 6).map((item: any, index: number) => (
+          <blockquote
+            key={item.id ?? index}
+            className="rounded-2xl border border-amber-100 bg-white p-6 shadow-sm"
+          >
+            <p className="text-brand-black text-base leading-relaxed">
+              {item.text}
+            </p>
+            <footer className="flex items-center gap-3 mt-6">
+              {item.user?.image?.url && (
+                <StrapiMedia
+                  src={item.user.image.url}
+                  alt={`${item.user.firstname} ${item.user.lastname}`}
+                  width={40}
+                  height={40}
+                  className="rounded-full h-10 w-10 object-cover"
+                />
+              )}
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-brand-black">
+                  {item.user?.firstname} {item.user?.lastname}
+                </span>
+                <span className="text-sm text-muted">{item.user?.job}</span>
+              </div>
+            </footer>
+          </blockquote>
+        ))}
       </div>
-
-      {testimonials && (
-        <div className="relative md:py-20 pb-20">
-          <TestimonialsSlider testimonials={testimonials} />
-          <div className="h-full w-full mt-20 bg-charcoal ">
-            <TestimonialsMarquee testimonials={testimonials} />
-          </div>
-        </div>
-      )}
-
-      <div className="absolute bottom-0 inset-x-0 h-40 w-full bg-gradient-to-t from-charcoal to-transparent"></div>
-    </div>
+    </section>
   );
 };

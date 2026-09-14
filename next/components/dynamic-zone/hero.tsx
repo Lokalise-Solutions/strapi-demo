@@ -4,12 +4,10 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import React from 'react';
 
-import { Cover } from '../decorations/cover';
-import ShootingStars from '../decorations/shooting-star';
-import StarBackground from '../decorations/star-background';
 import { Button } from '../elements/button';
 import { Heading } from '../elements/heading';
 import { Subheading } from '../elements/subheading';
+import { isExcludedMarketingUrl } from '@/lib/marketing';
 
 export const Hero = ({
   heading,
@@ -22,39 +20,41 @@ export const Hero = ({
   CTAs: any[];
   locale: string;
 }) => {
+  const actions = (CTAs ?? []).filter(
+    (cta) => isExcludedMarketingUrl(cta?.URL) === false
+  );
+
   return (
-    <div className="h-screen overflow-hidden relative flex flex-col items-center justify-center">
+    <div className="relative flex flex-col items-center justify-center px-4 pt-32 pb-20 md:pt-40 md:pb-28 bg-gradient-to-b from-peach-100 via-white to-white">
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.5 }}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45 }}
+        className="flex flex-col items-center"
       >
-        <StarBackground />
-        <ShootingStars />
-      </motion.div>
-      <Heading
-        as="h1"
-        className="text-4xl md:text-4xl lg:text-8xl font-semibold max-w-7xl mx-auto text-center mt-6 relative z-10  py-6"
-      >
-        {heading}
-      </Heading>
-      <Subheading className="text-center mt-2 md:mt-6 text-base md:text-xl text-muted  max-w-3xl mx-auto relative z-10">
-        {sub_heading}
-      </Subheading>
-      <div className="flex space-x-2 items-center mt-8">
-        {CTAs &&
-          CTAs.map((cta) => (
+        <Heading
+          as="h1"
+          size="2xl"
+          className="max-w-5xl mx-auto text-center relative z-10"
+        >
+          {heading}
+        </Heading>
+        <Subheading className="text-center mt-6 text-base md:text-xl text-muted max-w-3xl mx-auto relative z-10">
+          {sub_heading}
+        </Subheading>
+        <div className="flex flex-wrap gap-3 items-center justify-center mt-10">
+          {actions.map((cta, index) => (
             <Button
-              key={cta?.id}
+              key={cta?.id ?? cta?.text}
               as={Link}
               href={`/${locale}${cta.URL}`}
-              {...(cta.variant ? { variant: cta.variant } : {})}
+              variant={cta.variant ?? (index === 0 ? 'primary' : 'outline')}
             >
               {cta.text}
             </Button>
           ))}
-      </div>
-      <div className="absolute inset-x-0 bottom-0 h-80 w-full bg-gradient-to-t from-charcoal to-transparent" />
+        </div>
+      </motion.div>
     </div>
   );
 };
