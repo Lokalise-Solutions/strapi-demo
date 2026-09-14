@@ -17,7 +17,7 @@ interface StrapiMediaProps
   audioProps?: Omit<AudioHTMLAttributes<HTMLAudioElement>, 'src' | 'className'>;
 }
 
-export function getStrapiMedia(url: string | null) {
+export function getStrapiMedia(url?: string | null) {
   if (url == null) return null;
   const cleanUrl = stripStegaMarkers(url);
   if (cleanUrl.startsWith('data:')) return cleanUrl;
