@@ -1,18 +1,12 @@
+import { normalizeStrapiApiUrl } from './lib/strapi/normalize-api-url.mjs';
+
 const strapiOrigin = () => {
   const raw = process.env.NEXT_PUBLIC_API_URL;
   if (raw === undefined || raw.trim() === '') {
     return undefined;
   }
 
-  try {
-    const parsed = new URL(raw);
-    if (parsed.hostname === 'localhost') {
-      parsed.hostname = '127.0.0.1';
-    }
-    return parsed.toString().replace(/\/$/, '');
-  } catch {
-    return raw;
-  }
+  return normalizeStrapiApiUrl(raw);
 };
 
 /** @type {import('next').NextConfig} */

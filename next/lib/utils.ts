@@ -1,6 +1,8 @@
 import { ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+import { normalizeStrapiApiUrl } from './strapi/normalize-api-url.mjs';
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -24,19 +26,7 @@ export const formatNumber = (
 const resolveApiUrl = (): string => {
   const fromEnv = process.env.NEXT_PUBLIC_API_URL;
   if (fromEnv !== undefined && fromEnv.trim() !== '') {
-    // Node 17+ prefers IPv6 for `localhost`. Strapi binds 0.0.0.0 (IPv4),
-    // so server-side fetches to localhost:1337 can hang until TCP timeout
-    // and leave the root Suspense spinner on screen.
-    try {
-      const parsed = new URL(fromEnv);
-      if (parsed.hostname === 'localhost') {
-        parsed.hostname = '127.0.0.1';
-        return parsed.toString().replace(/\/$/, '');
-      }
-    } catch {
-      return fromEnv;
-    }
-    return fromEnv;
+    return normalizeStrapiApiUrl(fromEnv);
   }
 
   return globalThis.document?.location.host.endsWith('.strapidemo.com')

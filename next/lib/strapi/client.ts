@@ -144,17 +144,60 @@ function isLocaleFallbackError(error: unknown): boolean {
   );
 }
 
-function withDraftStatus(
+function omitDefaultLocale(
+  options: API.BaseQueryParams | undefined
+): API.BaseQueryParams {
+  const locale = requestedLocale(options);
+  if (locale !== i18n.defaultLocale) {
+    return { ...options };
+  }
+
+  const next: API.BaseQueryParams = { ...options };
+  delete next.locale;
+
+  if (next.filters !== undefined && next.filters !== null) {
+    const filters = { ...(next.filters as Record<string, unknown>) };
+    delete filters.locale;
+    next.filters = filters as API.BaseQueryParams['filters'];
+  }
+
+  return next;
+}
+
+function withContentQuery(
   options: API.BaseQueryParams | undefined,
   isDraft: boolean
 ): API.BaseQueryParams {
+  const next = omitDefaultLocale(options);
   if (isDraft === true) {
-    return { ...options, status: 'draft' };
+    return { ...next, status: 'draft' };
   }
 
-  // Published is the REST default. Sending status=published 400s on some
-  // Strapi Cloud versions ("Invalid key status") and fails the Vercel prerender.
-  return { ...options };
+  return next;
+}
+
+async function attachStrapiBody(error: unknown): Promise<void> {
+  if (error === null || error === undefined || typeof error !== 'object') {
+    return;
+  }
+
+  const response =
+    'response' in error
+      ? (error as { response?: Response }).response
+      : undefined;
+  if (response === undefined || response.bodyUsed === true) {
+    return;
+  }
+
+  try {
+    const body = await response.text();
+    console.error(`[strapi] ${API_URL} ${body}`);
+    if (error instanceof Error && body.length > 0) {
+      error.message = `${error.message} ${body}`;
+    }
+  } catch {
+    // Keep the original error if the body cannot be read.
+  }
 }
 
 async function findSingleWithLocaleFallback<T>(
@@ -166,7 +209,7 @@ async function findSingleWithLocaleFallback<T>(
   try {
     const { data } = await createClient(config, isDraft)
       .single(singleTypeName)
-      .find(withDraftStatus(options, isDraft));
+      .find(withContentQuery(options, isDraft));
     return data as T;
   } catch (error) {
     const locale = requestedLocale(options);
@@ -177,10 +220,11 @@ async function findSingleWithLocaleFallback<T>(
     ) {
       const { data } = await createClient(config, isDraft)
         .single(singleTypeName)
-        .find(withDraftStatus(withLocale(options, i18n.defaultLocale), isDraft));
+        .find(withContentQuery(withLocale(options, i18n.defaultLocale), isDraft));
       return data as T;
     }
 
+    await attachStrapiBody(error);
     throw error;
   }
 }
@@ -227,7 +271,7 @@ async function fetchCollectionCached<T = API.Document[]>(
 
   const { data } = await createClient(config)
     .collection(collectionName)
-    .find(withDraftStatus(options, false));
+    .find(withContentQuery(options, false));
 
   return data as T;
 }
@@ -250,14 +294,14 @@ export async function fetchCollectionType<T = API.Document[]>(
     if (isDraftMode) {
       const { data } = await createClient(config, true)
         .collection(collectionName)
-        .find(withDraftStatus(query, true));
+        .find(withContentQuery(query, true));
       return data as T;
     }
 
     if (process.env.ENVIRONMENT === 'development') {
       const { data } = await createClient(config)
         .collection(collectionName)
-        .find(withDraftStatus(query, false));
+        .find(withContentQuery(query, false));
       return data as T;
     }
 
@@ -399,7 +443,7 @@ async function fetchDocumentCached<T = API.Document>(
 
   const { data } = await createClient(config)
     .collection(collectionName)
-    .findOne(documentId, withDraftStatus(options, false));
+    .findOne(documentId, withContentQuery(options, false));
 
   return data as T;
 }
@@ -425,14 +469,14 @@ export async function fetchDocument<T = API.Document>(
         if (isDraftMode) {
           const { data } = await createClient(config, true)
             .collection(collectionName)
-            .findOne(documentId, withDraftStatus(options, true));
+            .findOne(documentId, withContentQuery(options, true));
           return data as T;
         }
 
         if (process.env.ENVIRONMENT === 'development') {
           const { data } = await createClient(config)
             .collection(collectionName)
-            .findOne(documentId, withDraftStatus(options, false));
+            .findOne(documentId, withContentQuery(options, false));
           return data as T;
         }
 
