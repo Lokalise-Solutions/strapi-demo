@@ -106,25 +106,55 @@ function withLocale(
   return next;
 }
 
-function isNotFoundError(error: unknown): boolean {
+function httpStatus(error: unknown): number | undefined {
   if (error === null || error === undefined || typeof error !== 'object') {
-    return false;
+    return undefined;
   }
 
-  if ('status' in error && (error as { status?: unknown }).status === 404) {
-    return true;
+  if (
+    'status' in error &&
+    typeof (error as { status?: unknown }).status === 'number'
+  ) {
+    return (error as { status: number }).status;
   }
 
   const response =
     'response' in error
       ? (error as { response?: { status?: unknown } }).response
       : undefined;
-  if (response?.status === 404) {
+  if (response !== undefined && typeof response.status === 'number') {
+    return response.status;
+  }
+
+  return undefined;
+}
+
+function isLocaleFallbackError(error: unknown): boolean {
+  const status = httpStatus(error);
+  if (status === 400 || status === 404) {
     return true;
   }
 
   const message = error instanceof Error ? error.message : '';
-  return message.includes('404') || message.includes('Not Found');
+  return (
+    message.includes('400') ||
+    message.includes('404') ||
+    message.includes('Bad Request') ||
+    message.includes('Not Found')
+  );
+}
+
+function withDraftStatus(
+  options: API.BaseQueryParams | undefined,
+  isDraft: boolean
+): API.BaseQueryParams {
+  if (isDraft === true) {
+    return { ...options, status: 'draft' };
+  }
+
+  // Published is the REST default. Sending status=published 400s on some
+  // Strapi Cloud versions ("Invalid key status") and fails the Vercel prerender.
+  return { ...options };
 }
 
 async function findSingleWithLocaleFallback<T>(
@@ -133,29 +163,21 @@ async function findSingleWithLocaleFallback<T>(
   config: Omit<Config, 'baseURL'> | undefined,
   isDraft: boolean
 ): Promise<T> {
-  const status = isDraft ? 'draft' : 'published';
-
   try {
     const { data } = await createClient(config, isDraft)
       .single(singleTypeName)
-      .find({
-        ...options,
-        status,
-      });
+      .find(withDraftStatus(options, isDraft));
     return data as T;
   } catch (error) {
     const locale = requestedLocale(options);
     if (
-      isNotFoundError(error) === true &&
+      isLocaleFallbackError(error) === true &&
       locale !== undefined &&
       locale !== i18n.defaultLocale
     ) {
       const { data } = await createClient(config, isDraft)
         .single(singleTypeName)
-        .find({
-          ...withLocale(options, i18n.defaultLocale),
-          status,
-        });
+        .find(withDraftStatus(withLocale(options, i18n.defaultLocale), isDraft));
       return data as T;
     }
 
@@ -205,10 +227,7 @@ async function fetchCollectionCached<T = API.Document[]>(
 
   const { data } = await createClient(config)
     .collection(collectionName)
-    .find({
-      ...options,
-      status: 'published',
-    });
+    .find(withDraftStatus(options, false));
 
   return data as T;
 }
@@ -231,20 +250,14 @@ export async function fetchCollectionType<T = API.Document[]>(
     if (isDraftMode) {
       const { data } = await createClient(config, true)
         .collection(collectionName)
-        .find({
-          ...query,
-          status: 'draft',
-        });
+        .find(withDraftStatus(query, true));
       return data as T;
     }
 
     if (process.env.ENVIRONMENT === 'development') {
       const { data } = await createClient(config)
         .collection(collectionName)
-        .find({
-          ...query,
-          status: 'published',
-        });
+        .find(withDraftStatus(query, false));
       return data as T;
     }
 
@@ -386,10 +399,7 @@ async function fetchDocumentCached<T = API.Document>(
 
   const { data } = await createClient(config)
     .collection(collectionName)
-    .findOne(documentId, {
-      ...options,
-      status: 'published',
-    });
+    .findOne(documentId, withDraftStatus(options, false));
 
   return data as T;
 }
@@ -415,20 +425,14 @@ export async function fetchDocument<T = API.Document>(
         if (isDraftMode) {
           const { data } = await createClient(config, true)
             .collection(collectionName)
-            .findOne(documentId, {
-              ...options,
-              status: 'draft',
-            });
+            .findOne(documentId, withDraftStatus(options, true));
           return data as T;
         }
 
         if (process.env.ENVIRONMENT === 'development') {
           const { data } = await createClient(config)
             .collection(collectionName)
-            .findOne(documentId, {
-              ...options,
-              status: 'published',
-            });
+            .findOne(documentId, withDraftStatus(options, false));
           return data as T;
         }
 
